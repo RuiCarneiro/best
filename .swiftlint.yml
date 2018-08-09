@@ -1,0 +1,20 @@
+disabled_rules:
+  - identifier_name
+  - cyclomatic_complexity
+opt_in_rules:
+  - empty_count
+  - closure_end_indentation
+  - closure_parameter_position 
+  - closure_spacing
+  - explicit_init
+  - let_var_whitespace
+  - nimble_operator
+  - number_separator
+  - redundant_nil_coalescing
+  - sorted_imports
+  - trailing_closure 
+  - operator_whitespace
+  - sorted_first_last
+
+
+

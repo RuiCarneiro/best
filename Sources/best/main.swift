@@ -1,14 +1,14 @@
 //  Copyright © 2018 Rui Carneiro. All rights reserved.
 
-import Foundation
 import Darwin
+import Foundation
 
 // MARK: - Exit
 
 enum Exit {
     case normal, walkOptionWithoutFileOrDirectoryOption, noArgument, invalidOption(option: Character), noResult
 
-    var code : Int32 {
+    var code: Int32 {
         switch self {
         case .normal: return 0
         case .walkOptionWithoutFileOrDirectoryOption, .noArgument, .invalidOption(option: _):
@@ -29,7 +29,6 @@ enum Exit {
     }
 }
 
-
 // MARK: - Prints
 
 func printError(_ message: String) {
@@ -40,7 +39,6 @@ func printUsage() {
     print("usage: best [-fdwpecrsi] argument")
 }
 
-
 // MARK: - Process Command Line Arguments
 
 enum OperatingMode {
@@ -48,18 +46,18 @@ enum OperatingMode {
 }
 
 struct Options {
-    var operatingMode : OperatingMode {
+    var operatingMode: OperatingMode {
         return (!includeFiles && !includeDirectories && !walkSubDirs) ? .stdin : .files
     }
-    var includeFiles : Bool = false
-    var includeDirectories : Bool = false
-    var walkSubDirs : Bool = false
-    var printFullPath : Bool = false
-    var quitWithErrorIfNoResultsFound : Bool = false
-    var replaceDotsWithSpaces : Bool = false
-    var caseSentitive : Bool = false
-    var removeWhiteSpace : Bool = false
-    var ignoreCandidatesThatDontContainTheArgument : Bool = false
+    var includeFiles: Bool = false
+    var includeDirectories: Bool = false
+    var walkSubDirs: Bool = false
+    var printFullPath: Bool = false
+    var quitWithErrorIfNoResultsFound: Bool = false
+    var replaceDotsWithSpaces: Bool = false
+    var caseSentitive: Bool = false
+    var removeWhiteSpace: Bool = false
+    var ignoreCandidatesThatDontContainTheArgument: Bool = false
 }
 
 func getOptions() -> Options {
@@ -88,7 +86,6 @@ func getOptions() -> Options {
     }
 
     // Check the validity of options
-
     if temp.walkSubDirs {
         if !(temp.includeFiles || temp.includeDirectories) {
             Exit.walkOptionWithoutFileOrDirectoryOption.exit()
@@ -105,13 +102,11 @@ func _getArgument() -> String? {
         return !arg.hasPrefix("-")
     }
 
-    if argumentsWithoutHypenPrefix.count == 0 {
+    if argumentsWithoutHypenPrefix.isEmpty {
         return nil
-    }
-    else if argumentsWithoutHypenPrefix.count == 1 {
+    } else if argumentsWithoutHypenPrefix.count == 1 {
         return argumentsWithoutHypenPrefix[0]
-    }
-    else {
+    } else {
         return argumentsWithoutHypenPrefix.joined(separator: " ")
     }
 }
@@ -119,8 +114,7 @@ func _getArgument() -> String? {
 func getArgument() -> String? {
     if let arg = _getArgument() {
         return options.caseSentitive ? arg : arg.lowercased()
-    }
-    else {
+    } else {
         return nil
     }
 }
@@ -128,13 +122,13 @@ func getArgument() -> String? {
 // MARK: - Init
 
 struct Candidate {
-    var value : String
-    var distance : Int
+    var value: String
+    var distance: Int
 }
 
 let options = getOptions()
 let argument = getArgument()
-var best : Candidate?
+var best: Candidate?
 
 // MARK: - Main
 
@@ -151,7 +145,7 @@ guard let argument = argument else {
     fatalError()
 }
 
-guard argument.count > 0 else {
+guard !argument.isEmpty else {
     Exit.noArgument.exit()
     fatalError()
 }
@@ -182,36 +176,36 @@ if options.operatingMode == .stdin {
                     if newDist < oldDist {
                         best = newCandidate
                     }
-                }
-                else {
+                } else {
                     best = newCandidate
                 }
             }
         }
     }
-}
-else {
+} else {
     // file mode
     let fm = FileManager.default
     let currentDirectory = fm.currentDirectoryPath
 
     func fillFiles(_ directory: String) -> [String] {
-        if options.walkSubDirs {
-            return try! fm.subpathsOfDirectory(atPath: currentDirectory)
-        }
-        else {
-            return try! fm.contentsOfDirectory(atPath: currentDirectory)
+        do {
+            if options.walkSubDirs {
+                return try fm.subpathsOfDirectory(atPath: currentDirectory)
+            } else {
+                return try fm.contentsOfDirectory(atPath: currentDirectory)
+            }
+        } catch {
+            fatalError(error.localizedDescription)
         }
     }
 
-    var contents : [String] = fillFiles(currentDirectory)
+    var contents: [String] = fillFiles(currentDirectory)
 
-    contents = contents.filter({ (item) -> Bool in
+    contents = contents.filter { (item) -> Bool in
         let isDir = fm.isDirectory(atPath: item)
 
         return isDir ? options.includeDirectories : options.includeFiles
-
-    })
+    }
 
     for item in contents {
         let newString = processString(item)
@@ -229,13 +223,11 @@ else {
             let newPath = options.printFullPath ? dir + item : item
             let itemCandidate = Candidate(value: newPath, distance: newDistance)
 
-
             if let b = best {
                 if newDistance < b.distance {
                     best = itemCandidate
                 }
-            }
-            else {
+            } else {
                 best = itemCandidate
             }
         }
@@ -243,14 +235,11 @@ else {
 
 }
 
-
-
 // present the result
 
 if let b = best {
     print(b.value)
-}
-else {
+} else {
     if options.quitWithErrorIfNoResultsFound {
         Exit.noResult.exit()
     }

@@ -2,7 +2,6 @@
 
 import Foundation
 
-
 extension FileManager {
     func isDirectory(atPath: String) -> Bool {
         var check: ObjCBool = false

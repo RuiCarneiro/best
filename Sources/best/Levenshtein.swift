@@ -25,8 +25,8 @@ extension String {
             return sCount
         }
 
-        let line : [Int]  = Array(repeating: 0, count: oCount + 1)
-        var mat : [[Int]] = Array(repeating: line, count: sCount + 1)
+        let line: [Int]  = Array(repeating: 0, count: oCount + 1)
+        var mat: [[Int]] = Array(repeating: line, count: sCount + 1)
 
         for i in 0...sCount {
             mat[i][0] = i
@@ -40,8 +40,7 @@ extension String {
             for i in 1...sCount {
                 if self[i - 1] == other[j - 1] {
                     mat[i][j] = mat[i - 1][j - 1]       // no operation
-                }
-                else {
+                } else {
                     let del = mat[i - 1][j] + 1         // deletion
                     let ins = mat[i][j - 1] + 1         // insertion
                     let sub = mat[i - 1][j - 1] + 1     // substitution
