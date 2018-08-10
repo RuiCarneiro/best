@@ -13,7 +13,7 @@ enum Exit {
         case .normal: return 0
         case .walkOptionWithoutFileOrDirectoryOption, .noArgument, .invalidOption(option: _):
             return POSIXError.EINVAL.rawValue
-        case .noResult: return 1
+        case .noResult: return options.quitWithErrorIfNoResultsFound ? 1 : 0
         }
     }
 
@@ -202,10 +202,18 @@ if options.operatingMode == .stdin {
 
     var contents: [String] = fillFiles(currentDirectory)
 
-    contents = contents.filter { (item) -> Bool in
-        let isDir = fm.isDirectory(atPath: item)
+    let includeBothFilesAndDirs = options.includeDirectories && options.includeFiles
 
-        return isDir ? options.includeDirectories : options.includeFiles
+    if !includeBothFilesAndDirs {
+        contents = contents.filter { (item) -> Bool in
+            let isDir = fm.isDirectory(atPath: item)
+            if options.includeDirectories {
+                return isDir
+            }
+            else {
+                return !isDir
+            }
+        }
     }
 
     for item in contents {
