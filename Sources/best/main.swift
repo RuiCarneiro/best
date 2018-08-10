@@ -185,6 +185,7 @@ if options.operatingMode == .stdin {
     }
 } else {
     // file mode
+    
     let fm = FileManager.default
     let currentDirectory = fm.currentDirectoryPath
 
