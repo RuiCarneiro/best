@@ -22,7 +22,8 @@ enum Exit {
         case .walkOptionWithoutFileOrDirectoryOption: printError("Option -w requires option -f and/or option -d.")
         case .noArgument: printError("Missing argument."); printUsage()
         case .invalidOption(option: let c): printError("Invalid option: \(c)"); printUsage()
-        default: ()
+        case .normal: ()
+        case .noResult: ()
         }
 
         Darwin.exit(self.code)
@@ -95,23 +96,23 @@ func getOptions() -> Options {
     return temp
 }
 
-func _getArgument() -> String? {
-    let args = CommandLine.arguments.dropFirst()
-
-    let argumentsWithoutHypenPrefix = args.filter { (arg) -> Bool in
-        return !arg.hasPrefix("-")
-    }
-
-    if argumentsWithoutHypenPrefix.isEmpty {
-        return nil
-    } else if argumentsWithoutHypenPrefix.count == 1 {
-        return argumentsWithoutHypenPrefix[0]
-    } else {
-        return argumentsWithoutHypenPrefix.joined(separator: " ")
-    }
-}
-
 func getArgument() -> String? {
+    func _getArgument() -> String? {
+        let args = CommandLine.arguments.dropFirst()
+
+        let argumentsWithoutHypenPrefix = args.filter { (arg) -> Bool in
+            return !arg.hasPrefix("-")
+        }
+
+        if argumentsWithoutHypenPrefix.isEmpty {
+            return nil
+        } else if argumentsWithoutHypenPrefix.count == 1 {
+            return argumentsWithoutHypenPrefix[0]
+        } else {
+            return argumentsWithoutHypenPrefix.joined(separator: " ")
+        }
+    }
+
     if let arg = _getArgument() {
         return options.caseSentitive ? arg : arg.lowercased()
     } else {
