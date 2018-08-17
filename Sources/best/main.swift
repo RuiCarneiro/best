@@ -133,7 +133,7 @@ var best: Candidate?
 
 // MARK: - Main
 
-// process the input string according to the options speccified
+// process a input string according to the options speccified
 func processString(_ str: String) -> String {
     let a = options.caseSentitive ? str : str.lowercased()
     let b = options.replaceDotsWithSpaces ? a.replacingOccurrences(of: ".", with: " ") : a
@@ -185,7 +185,6 @@ if options.operatingMode == .stdin {
     }
 } else {
     // file mode
-    
     let fm = FileManager.default
     let currentDirectory = fm.currentDirectoryPath
 
@@ -249,10 +248,9 @@ if options.operatingMode == .stdin {
 
 if let b = best {
     print(b.value)
+    Exit.normal.exit()
 } else {
     if options.quitWithErrorIfNoResultsFound {
         Exit.noResult.exit()
     }
 }
-
-Exit.normal.exit()
