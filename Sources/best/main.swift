@@ -13,7 +13,7 @@ enum Exit {
         case .normal: return 0
         case .walkOptionWithoutFileOrDirectoryOption, .noArgument, .invalidOption(option: _):
             return POSIXError.EINVAL.rawValue
-        case .noResult: return options.quitWithErrorIfNoResultsFound ? 1 : 0
+        case .noResult: return 1
         }
     }
 
@@ -252,5 +252,8 @@ if let b = best {
 } else {
     if options.quitWithErrorIfNoResultsFound {
         Exit.noResult.exit()
+    }
+    else {
+        Exit.normal.exit()
     }
 }
