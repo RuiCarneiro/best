@@ -131,15 +131,64 @@ let options = getOptions()
 let argument = getArgument()
 var best: Candidate?
 
-// MARK: - Main
+// MARK: - Helper functions
+
+// executes loop while the return of the condition is not nil
+// TODO: better doc
+func whileNotNil<T>(_ condition: () -> T?, _ loop: (T) -> Void) {
+    var foo = condition()
+    while foo != nil {
+        if let bar = foo {
+            loop(bar)
+        }
+        foo = condition()
+    }
+}
+
+// replaces the current candiadate if the new one is better or the old one is nil
+func replaceIfBetterCandidate(old: inout Candidate?, new: Candidate) {
+    if let o = old {
+        let oldDist = o.distance
+        let newDist = new.distance
+
+        if newDist < oldDist {
+            old = new
+        }
+    } else {
+        old = new
+    }
+}
 
 // process a input string according to the options speccified
 func processString(_ str: String) -> String {
-    let a = options.caseSentitive ? str : str.lowercased()
-    let b = options.replaceDotsWithSpaces ? a.replacingOccurrences(of: ".", with: " ") : a
-    let c = options.removeWhiteSpace ? b.trimmingCharacters(in: CharacterSet.whitespaces) : b
-    return c
+    var out = str
+
+    if options.caseSentitive {
+        out = out.lowercased()
+    }
+
+    if options.replaceDotsWithSpaces {
+        out = out.replacingOccurrences(of: ".", with: " ")
+    }
+
+    if options.removeWhiteSpace {
+        out = out.trimmingCharacters(in: .whitespaces)
+    }
+
+    return out
 }
+
+// determines if line should be accepted
+func shouldAcceptLine(_ str: String) -> Bool {
+    if options.ignoreCandidatesThatDontContainTheArgument {
+        if !str.contains(argument!) {
+            return false
+        }
+    }
+    return true
+}
+
+// MARK: - Main
 
 guard let argument = argument else {
     Exit.noArgument.exit()
@@ -153,36 +202,18 @@ guard !argument.isEmpty else {
 
 if options.operatingMode == .stdin {
     // stdin mode
-    var newLine: String? = "" // not nil
-    while newLine != nil {
-        newLine = readLine(strippingNewline: true)
 
-        if let nl = newLine {
-            let newString = processString(nl)
+    whileNotNil({ return readLine(strippingNewline: true) }) {
+        let newString = processString($0)
 
-            var skipThisOne = false
-            if options.ignoreCandidatesThatDontContainTheArgument {
-                if !newString.contains(argument) {
-                    skipThisOne = true
-                }
-            }
+        if shouldAcceptLine(newString) {
+            let newDist = argument.levenshtein(newString)
+            let newCandidate = Candidate(value: $0, distance: newDist)
 
-            if !skipThisOne {
-                let newDist = argument.levenshtein(newString)
-                let newCandidate = Candidate(value: newLine!, distance: newDist)
-
-                if let b = best {
-                    let oldDist = b.distance
-
-                    if newDist < oldDist {
-                        best = newCandidate
-                    }
-                } else {
-                    best = newCandidate
-                }
-            }
+            replaceIfBetterCandidate(old: &best, new: newCandidate)
         }
     }
+
 } else {
     // file mode
     let fm = FileManager.default
@@ -203,15 +234,15 @@ if options.operatingMode == .stdin {
     var contents: [String] = fillFiles(currentDirectory)
 
     let includeBothFilesAndDirs = options.includeDirectories && options.includeFiles
-
     if !includeBothFilesAndDirs {
         contents = contents.filter { (item) -> Bool in
             let isDir = fm.isDirectory(atPath: item)
+            let isFile = !isDir
+
             if options.includeDirectories {
                 return isDir
-            }
-            else {
-                return !isDir
+            } else {
+                return isFile
             }
         }
     }
@@ -219,29 +250,15 @@ if options.operatingMode == .stdin {
     for item in contents {
         let newString = processString(item)
 
-        var skipThisOne = false
-        if options.ignoreCandidatesThatDontContainTheArgument {
-            if !newString.contains(argument) {
-                skipThisOne = true
-            }
-        }
-
-        if !skipThisOne {
+        if shouldAcceptLine(newString) {
             let newDistance = argument.levenshtein(newString)
             let dir = currentDirectory == "/" ? currentDirectory : currentDirectory + "/"
             let newPath = options.printFullPath ? dir + item : item
-            let itemCandidate = Candidate(value: newPath, distance: newDistance)
+            let newCandidate = Candidate(value: newPath, distance: newDistance)
 
-            if let b = best {
-                if newDistance < b.distance {
-                    best = itemCandidate
-                }
-            } else {
-                best = itemCandidate
-            }
+            replaceIfBetterCandidate(old: &best, new: newCandidate)
         }
     }
-
 }
 
 // present the result
@@ -252,8 +269,7 @@ if let b = best {
 } else {
     if options.quitWithErrorIfNoResultsFound {
         Exit.noResult.exit()
-    }
-    else {
+    } else {
         Exit.normal.exit()
     }
 }
