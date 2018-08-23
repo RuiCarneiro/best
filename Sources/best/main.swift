@@ -134,7 +134,6 @@ var best: Candidate?
 // MARK: - Helper functions
 
 // executes loop while the return of the condition is not nil
-// TODO: better doc
 func whileNotNil<T>(_ condition: () -> T?, _ loop: (T) -> Void) {
     var foo = condition()
     while foo != nil {
@@ -163,7 +162,7 @@ func replaceIfBetterCandidate(old: inout Candidate?, new: Candidate) {
 func processString(_ str: String) -> String {
     var out = str
 
-    if options.caseSentitive {
+    if !options.caseSentitive {
         out = out.lowercased()
     }
 
@@ -241,9 +240,10 @@ if options.operatingMode == .stdin {
 
             if options.includeDirectories {
                 return isDir
-            } else {
+            } else if options.includeFiles {
                 return isFile
             }
+            return false
         }
     }
 
