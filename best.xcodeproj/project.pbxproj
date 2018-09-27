@@ -10,6 +10,7 @@
 		5277AD1C2110A29300FBB52E /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5277AD1B2110A29300FBB52E /* main.swift */; };
 		5277AD1E21130E8200FBB52E /* Levenshtein.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5277AD1D21130E8200FBB52E /* Levenshtein.swift */; };
 		528B41EF211434C800D0431B /* FileManager+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528B41EE211434C800D0431B /* FileManager+.swift */; };
+		528B596D2150D43E0056867C /* OsDependent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528B596C2150D43E0056867C /* OsDependent.swift */; };
 		OBJ_25 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 /* End PBXBuildFile section */
 
@@ -17,6 +18,7 @@
 		5277AD1B2110A29300FBB52E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		5277AD1D21130E8200FBB52E /* Levenshtein.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Levenshtein.swift; sourceTree = "<group>"; };
 		528B41EE211434C800D0431B /* FileManager+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+.swift"; sourceTree = "<group>"; };
+		528B596C2150D43E0056867C /* OsDependent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OsDependent.swift; sourceTree = "<group>"; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		"best::best::Product" /* best */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = best; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -71,6 +73,7 @@
 				5277AD1B2110A29300FBB52E /* main.swift */,
 				5277AD1D21130E8200FBB52E /* Levenshtein.swift */,
 				528B41EE211434C800D0431B /* FileManager+.swift */,
+				528B596C2150D43E0056867C /* OsDependent.swift */,
 			);
 			name = best;
 			path = Sources/best;
@@ -164,6 +167,7 @@
 			buildActionMask = 0;
 			files = (
 				528B41EF211434C800D0431B /* FileManager+.swift in Sources */,
+				528B596D2150D43E0056867C /* OsDependent.swift in Sources */,
 				5277AD1C2110A29300FBB52E /* main.swift in Sources */,
 				5277AD1E21130E8200FBB52E /* Levenshtein.swift in Sources */,
 			);

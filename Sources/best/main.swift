@@ -1,6 +1,5 @@
 //  Copyright © 2018 Rui Carneiro. All rights reserved.
 
-import Darwin
 import Foundation
 
 // MARK: - Exit
@@ -12,7 +11,7 @@ enum Exit {
         switch self {
         case .normal: return 0
         case .walkOptionWithoutFileOrDirectoryOption, .noArgument, .invalidOption(option: _):
-            return POSIXError.EINVAL.rawValue
+            return OSDependent.invalidArgumentErrorCode
         case .noResult: return 1
         }
     }
@@ -26,7 +25,7 @@ enum Exit {
         case .noResult: ()
         }
 
-        Darwin.exit(self.code)
+        OSDependent.exit(code: self.code)
     }
 }
 
@@ -135,12 +134,10 @@ var best: Candidate?
 
 // executes loop while the return of the condition is not nil
 func whileNotNil<T>(_ condition: () -> T?, _ loop: (T) -> Void) {
-    var foo = condition()
-    while foo != nil {
-        if let bar = foo {
-            loop(bar)
-        }
-        foo = condition()
+    var x = condition()
+    while x != nil {
+        loop(x!)
+        x = condition()
     }
 }
 
